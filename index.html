@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle de Manutenção Veicular</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <script>
+  (function () {
+    const PASSWORD = 'pwa2025';          // 👉 TROQUE AQUI SE QUISER OUTRA SENHA
+    const STORAGE_KEY = 'acesso_site_ok';
+
+    // Se já tiver acesso liberado, não faz nada
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      return;
+    }
+
+    const tentativa = prompt('Digite a senha para entrar no site:');
+
+    if (tentativa === PASSWORD) {
+      // Libera definitivamente neste navegador
+      localStorage.setItem(STORAGE_KEY, 'true');
+      // segue a vida normalmente
+    } else {
+      alert('Senha incorreta. Acesso negado.');
+      // Opcional: manda pra outro lugar
+      window.location.href = 'https://google.com'; 
+      // pode trocar por outra página sua, se quiser
+    }
+  })();
+</script>
+  <header class="app-header">
+    <h1>Controle Veicular</h1>
+    <p class="subtitle">Gastos, manutenções e situação real do carro e da moto</p>
+  </header>
+
+  <main class="app-main">
+    <!-- Página: Home -->
+    <section id="page-home" class="page active">
+      <div class="hero-card">
+        <img src="assets/carro-moto.jpg" alt="Carro e moto" class="hero-img" />
+        <div>
+          <h2>Seu painel de manutenção no bolso</h2>
+          <p>
+            Cadastre seus veículos, registre peças e serviços, acompanhe
+            garantias, quilometragem e veja quanto cada veículo está te custando.
+          </p>
+          <button class="btn primary" data-goto="page-veiculos">
+            Começar agora
+          </button>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h3>O que você vai controlar</h3>
+        <ul>
+          <li>📌 Registro de peças e serviços por veículo</li>
+          <li>⏱️ Garantia em km e em tempo</li>
+          <li>🚦 Status: em dia, perto de vencer, vencido</li>
+          <li>💰 Total gasto por ano e por veículo</li>
+          <li>📊 Resumo visual da situação do carro/moto</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Página: Veículos -->
+    <section id="page-veiculos" class="page">
+      <h2>Veículos</h2>
+
+      <form id="form-veiculo" class="card form-card">
+        <h3>Cadastrar / editar veículo</h3>
+        <div class="form-group">
+          <label for="veiculo-nome">Nome do veículo</label>
+          <input id="veiculo-nome" type="text" placeholder="Ex: Jetta 2018, Tiger 900" required />
+        </div>
+        <div class="form-group">
+          <label for="veiculo-tipo">Tipo</label>
+          <select id="veiculo-tipo" required>
+            <option value="carro">Carro</option>
+            <option value="moto">Moto</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="veiculo-km">Km atual</label>
+          <input id="veiculo-km" type="number" min="0" step="1" placeholder="Ex: 84500" required />
+        </div>
+        <button type="submit" class="btn primary">Salvar veículo</button>
+      </form>
+
+      <div class="card">
+        <h3>Meus veículos</h3>
+        <ul id="lista-veiculos" class="list"></ul>
+      </div>
+    </section>
+
+    <!-- Página: Manutenções / Peças e Serviços -->
+    <section id="page-manutencoes" class="page">
+      <h2>Manutenções</h2>
+
+      <form id="form-manutencao" class="card form-card">
+        <h3>Registrar / editar peça ou serviço</h3>
+
+        <div class="form-group">
+          <label for="manutencao-veiculo">Veículo</label>
+          <select id="manutencao-veiculo" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="manutencao-data">Data</label>
+          <input id="manutencao-data" type="date" required />
+        </div>
+
+        <div class="form-group">
+          <label for="manutencao-descricao">Peça / Serviço</label>
+          <input id="manutencao-descricao" type="text" placeholder="Ex: Pastilha dianteira, troca de óleo" required />
+        </div>
+
+        <div class="form-group">
+          <label for="manutencao-tipo">Tipo</label>
+          <select id="manutencao-tipo" required>
+            <option value="peca">Só peça</option>
+            <option value="servico">Só serviço</option>
+            <option value="peca-servico">Peça + serviço</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="manutencao-km">Km na data</label>
+            <input id="manutencao-km" type="number" min="0" step="1" required />
+          </div>
+          <div class="form-group">
+            <label for="manutencao-km-garantia">Garantia (km)</label>
+            <input id="manutencao-km-garantia" type="number" min="0" step="1" placeholder="Ex: 20000" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="manutencao-meses-garantia">Garantia (meses)</label>
+            <input id="manutencao-meses-garantia" type="number" min="0" step="1" placeholder="Ex: 12" />
+          </div>
+          <div class="form-group">
+            <label for="manutencao-mecanico">Mecânico / Local</label>
+            <input id="manutencao-mecanico" type="text" placeholder="Ex: João Mecânica X" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="manutencao-valor-peca">Valor peça (R$)</label>
+            <input id="manutencao-valor-peca" type="number" min="0" step="0.01" />
+          </div>
+          <div class="form-group">
+            <label for="manutencao-valor-servico">Valor serviço (R$)</label>
+            <input id="manutencao-valor-servico" type="number" min="0" step="0.01" />
+          </div>
+        </div>
+
+        <button type="submit" class="btn primary">Salvar manutenção</button>
+      </form>
+
+      <div class="card">
+        <h3>Filtro</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="filtro-veiculo">Veículo</label>
+            <select id="filtro-veiculo"></select>
+          </div>
+          <div class="form-group">
+            <label for="filtro-tipo">Tipo</label>
+            <select id="filtro-tipo">
+              <option value="">Todos</option>
+              <option value="peca">Só peça</option>
+              <option value="servico">Só serviço</option>
+              <option value="peca-servico">Peça + serviço</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Histórico de manutenções</h3>
+        <ul id="lista-manutencoes" class="list"></ul>
+      </div>
+    </section>
+
+    <!-- Página: Atualizar Km -->
+    <section id="page-km" class="page">
+      <h2>Atualizar quilometragem</h2>
+
+      <form id="form-km" class="card form-card">
+        <div class="form-group">
+          <label for="km-veiculo">Veículo</label>
+          <select id="km-veiculo" required></select>
+        </div>
+        <div class="form-group">
+          <label for="km-atual">Km atual</label>
+          <input id="km-atual" type="number" min="0" step="1" required />
+        </div>
+        <button type="submit" class="btn primary">Atualizar km</button>
+      </form>
+
+      <div class="card">
+        <h3>Resumo rápido</h3>
+        <ul id="lista-km-resumo" class="list"></ul>
+      </div>
+    </section>
+
+    <!-- Página: Dashboard / Gráfico -->
+    <section id="page-dashboard" class="page">
+      <h2>Painel do veículo</h2>
+
+      <div class="card form-card">
+        <div class="form-group">
+          <label for="dashboard-veiculo">Veículo</label>
+          <select id="dashboard-veiculo"></select>
+        </div>
+        <div class="form-group">
+          <label for="dashboard-ano">Ano</label>
+          <input id="dashboard-ano" type="number" min="2000" step="1" />
+        </div>
+        <button id="btn-atualizar-dashboard" class="btn primary">
+          Atualizar painel
+        </button>
+      </div>
+
+      <div class="card">
+        <h3>Resumo financeiro</h3>
+        <p id="dashboard-resumo-financeiro">Selecione um veículo e um ano.</p>
+        <div class="chart">
+          <div class="chart-row">
+            <span>Peças</span>
+            <div class="chart-bar">
+              <div id="bar-pecas" class="bar bar-pecas"></div>
+            </div>
+            <span id="label-pecas" class="chart-value">R$ 0,00</span>
+          </div>
+          <div class="chart-row">
+            <span>Serviços</span>
+            <div class="chart-bar">
+              <div id="bar-servicos" class="bar bar-servicos"></div>
+            </div>
+            <span id="label-servicos" class="chart-value">R$ 0,00</span>
+          </div>
+          <div class="chart-row">
+            <span>Total</span>
+            <div class="chart-bar">
+              <div id="bar-total" class="bar bar-total"></div>
+            </div>
+            <span id="label-total" class="chart-value">R$ 0,00</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Situação das peças</h3>
+        <ul id="dashboard-situacao" class="list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <nav class="app-nav">
+    <button class="nav-btn active" data-goto="page-home">Início</button>
+    <button class="nav-btn" data-goto="page-veiculos">Veículos</button>
+    <button class="nav-btn" data-goto="page-manutencoes">Manutenções</button>
+    <button class="nav-btn" data-goto="page-km">Km</button>
+    <button class="nav-btn" data-goto="page-dashboard">Painel</button>
+  </nav>
+</body>
+</html>
